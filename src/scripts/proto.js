@@ -1,28 +1,31 @@
 /**
  * 遍历对象的属性，包括原型属性
  */
-var obj = {}
+var person = {
+    NO : 'CA92384',
+    city : 'BeiJing'
+}
 
-obj.a = {
-    aa:'aa',
-    b : {
-        b1:1,
-        b2:3,
-        name : 'obj.a.b'
+person.person = {
+    name:'Tom',
+    address : {
+        province: '北京',
+        city: '北京市',
+        area : '海淀区'
     },
-    //c : obj.b,
-    'name' :'obj.a'
+    age : 23,
+    department : '机票事业部',
+    job : 'FE'
 }
 
-obj.b = {
+person.other = {
     //aa : obj.a,
-    bb: 'bb',
-    'name':'obj.b'
+    company: 'Qunar',
+    mobile : '1861222222',
+    sex : 'F'
 }
 
-obj.a.c = obj.b;
-
-obj.name = 'obj'
+person._id = "CA9238419"
 
 //obj.a.b = obj.b;
 
@@ -128,6 +131,10 @@ function checkCircleDependence(obj, parents){
     return result
 }
 
+function getPrex(){
+    //TODO ...
+}
+
 /**
  *
  * @param obj
@@ -226,7 +233,7 @@ function createEntity(obj, name, deep, _id, _parentID){
     // title.innerHTML = name || ':(';
     // document.body.appendChild(title);
 
-    var posX = deep * 260,
+    var posX = deep * 260 + 10,
         posY = (deepObj[deep] - 1) * 200 + 20;
 
     ul.style.position = 'absolute';
@@ -239,12 +246,16 @@ function createEntity(obj, name, deep, _id, _parentID){
     ul.id = _id;
 
     tmp = li.cloneNode();
-    tmp.innerHTML = '<div style="color:red">' + (name || ':(') + '</div>';
+    tmp.style.background = '#BEF4AA';
+    tmp.innerHTML = '<div style="color:red; font-size:14px; text-align:center">' + (name || '') + ' [' + typeof(obj) + ']</div>';
     ul.appendChild(tmp);
 
     for(; i<len; i++){
         tmp = li.cloneNode();
-        tmp.innerHTML = '<strong>' + keys[i] + '</strong>' + ': [' + typeof obj[keys[i]] + ']';
+        tmp.innerHTML = '<span class="cell">' + keys[i] + '</span>' + ' <span class="cell">' +
+            (type(obj[keys[i]]) === 'function' || type(obj[keys[i]]) === 'object'
+            ? '[' + type(obj[keys[i]]) + ']'
+            : type(obj[keys[i]]) === 'string' ? '"' + obj[keys[i]] + '"' : obj[keys[i]]) ;
         ul.appendChild(tmp);
     }
 
@@ -266,7 +277,6 @@ function relation(id, parentID, index){
     //svg.setAttribute('height', '100%');
     var start = posObj[parentID],
         end = posObj[id];
-        console.log(start, end);
     if(!start || !end){
         return
     }
@@ -275,6 +285,7 @@ function relation(id, parentID, index){
         endX = end.left,
         endY = end.top + 10;
 
+    // 折现
     path.setAttribute('d',
         //起点
         'M ' + startX + ' ' + startY +
@@ -284,10 +295,33 @@ function relation(id, parentID, index){
         ' L ' + (endX + startX) / 2 + ' ' + endY +
         //终点
         ' L ' + endX + ' ' + endY);
+    // 贝塞尔曲线
+    // <path d="M97 336 C288 339 143 55 327 51" />
+    // tools http://blogs.sitepointstatic.com/examples/tech/svg-curves/cubic-curve.html
+    // path.setAttribute('d',
+    //     'M' + startX + ',' + startY + ' C' + [endX, startY, startX, endY, endX, endY].join(' ')
+    // )
     path.setAttribute('stroke', "orange");
     path.setAttribute('stroke-width', "1");
     path.setAttribute('fill', "none");
     path.setAttribute('marker-end',"url(#markerArrow)");
+    //path.setAttribute('stroke-dasharray', "10 5 5 5");
+    path.setAttribute('style','cursor:pointer');
+    path.setAttribute('relation',id + parentID);
+    path.addEventListener('mouseover', function(){
+        setTimeout(function(){
+            $(id).style.background = "rgba(235,13,13,.6)";
+            $(parentID).style.background = "rgba(235,13,13,.6)";
+            path.setAttribute('stroke-dasharray', "10 5 5 5");
+        },200)
+    })
+    path.addEventListener('mouseout', function(){
+        setTimeout(function(){
+            path.setAttribute('stroke-dasharray', "");
+            $(id).style.background = "";
+            $(parentID).style.background = "";
+        },200)
+    })
     svg.appendChild(path);
     //document.body.appendChild(svg);
 }
@@ -305,9 +339,16 @@ Math.guid = function(){
     }).toUpperCase();
 }
 
-console.log('Person:')
-proto(obj, false, [],'Person', '', Math.guid());
+console.log('person:')
+proto(person, false, [],'person', '', Math.guid());
 console.log('over....');
+
+
+function $(selector){
+    return document.getElementById(selector);
+    //return document.querySelectorAll(selector);
+}
+
 // Person:
 // |--name
 // |--age
