@@ -6,6 +6,11 @@ var person = {
     city : 'BeiJing'
 }
 
+var obj = {
+    'testA' : 'a',
+    'testB' : 'b'
+}
+
 person.person = {
     name:'Tom',
     address : {
@@ -14,6 +19,7 @@ person.person = {
         area : '海淀区'
     },
     age : 23,
+    test: obj,
     department : '机票事业部',
     job : 'FE'
 }
@@ -22,7 +28,9 @@ person.other = {
     //aa : obj.a,
     company: 'Qunar',
     mobile : '1861222222',
-    sex : 'F'
+    sex : 'F',
+    person: 'person',
+    test: obj
 }
 
 person._id = "CA9238419"
@@ -76,7 +84,7 @@ person._id = "CA9238419"
 // var obj = new Person();
 
 
-
+console.log = function(){};
 
 
 var buildInObjects = [
@@ -98,6 +106,10 @@ var buildInObjStr = [
     'Boolean.prototype',
     'RegExp.prototype'
 ]
+
+var objDB = [];
+
+var posDB = [];
 
 function getProps(obj, isProto){
     return type(obj) === 'object' || type(obj) === 'function'
@@ -144,7 +156,7 @@ function getPrex(){
  * @param prex
  */
 function proto(obj, isProto, from, name, prex, _id, _parentID, index){
-    var keys, curr, currPrex, len, objType,buildObjIndex;
+    var keys, curr, currPrex, len, objType, buildObjIndex;
     prex = prex || '';
     from = from || [];
 
@@ -160,9 +172,10 @@ function proto(obj, isProto, from, name, prex, _id, _parentID, index){
         return
     }
     ///////////////////
-    posObj[_id] = createEntity(obj, name, from.length, _id, _parentID);
+    //////posObj[_id] = createEntity(obj, name, from.length, _id, _parentID, index || 0);
+    createEntity(obj, name, from.length, _id, _parentID, index || 0);
 
-    _id && _parentID && relation(_id, _parentID, index || 0)
+    ///_id && _parentID && relation(_id, _parentID, index || 0)
     //////////////////
     keys = getProps(obj, isProto);
     //如果没有__proto__属性，加入数组遍历__proto__
@@ -186,8 +199,8 @@ function proto(obj, isProto, from, name, prex, _id, _parentID, index){
                     //console.log('指向', buildInObjects[buildObjIndex])
                     //console.log('|' + prex + (idx === len -1 ? '   |--' : '|  |--'), buildInObjects[buildObjIndex])
 
-                    console.log('|' + prex + (idx === len -1 ? '   |--' : '|  |--'), buildInObjStr[buildObjIndex])
-                    //createEntity(curr, buildInObjStr[buildObjIndex], from.length, _id, _parentID);
+                    ////console.log('|' + prex + (idx === len -1 ? '   |--' : '|  |--'), buildInObjStr[buildObjIndex])
+                    createEntity(curr, buildInObjStr[buildObjIndex], from.length + 1, Math.guid(), _id, idx);
                     return
                 }
 
@@ -211,30 +224,48 @@ function proto(obj, isProto, from, name, prex, _id, _parentID, index){
     });
 }
 
-var deepObj = {};
+//var deepObj = {};
 var a = 2;
 var posObj = {};
 
-function createEntity(obj, name, deep, _id, _parentID){
+function createEntity(obj, name, deep, _id, _parentID, index){
+
+    if(~objDB.indexOf(obj)){
+        //console.warn('cunzai::', obj,_parentID, posDB[objDB.indexOf(obj)]);
+        relation(posDB[objDB.indexOf(obj)], _parentID, index)
+        return
+    }
+
+    objDB.push(obj);
+    posDB.push(_id);
+
     var ul = document.createElement('ul'),
         li = document.createElement('li'),
         keys = Object.getOwnPropertyNames(obj),
         i = 0,
         len = keys.length,
-        tmp;
+        tmp,
+        _type;
 
-    keys.push('__proto__');
-    len++;
+    if(!~keys.indexOf('__proto__')){
+        keys.push('__proto__');
+        len++;
+    }
 
-    deepObj[deep] = (deepObj[deep] || 0) + 1;
+    //deepObj[deep] = (deepObj[deep] || 0) + 1;
 
 
     // var title = document.createElement('div');
     // title.innerHTML = name || ':(';
     // document.body.appendChild(title);
+    var prevHeight = getPrevHeight(deep);
 
+    console.log('deep', deep, 'height:', prevHeight);
     var posX = deep * 260 + 10,
-        posY = (deepObj[deep] - 1) * 200 + 20;
+        //posY = (deepObj[deep] - 1) * 200 + 20;
+        posY = prevHeight + 10;
+
+    ul.className = 'entity';
 
     ul.style.position = 'absolute';
     ul.style.width = '200px';
@@ -242,6 +273,8 @@ function createEntity(obj, name, deep, _id, _parentID){
     ul.style.left = posX;
     ul.style.overflow = 'scroll';
     ul.style.border = '1px solid black';
+
+    ul.setAttribute('data-deep', deep);
 
     ul.id = _id;
 
@@ -252,14 +285,41 @@ function createEntity(obj, name, deep, _id, _parentID){
 
     for(; i<len; i++){
         tmp = li.cloneNode();
-        tmp.innerHTML = '<span class="cell">' + keys[i] + '</span>' + ' <span class="cell">' +
-            (type(obj[keys[i]]) === 'function' || type(obj[keys[i]]) === 'object'
-            ? '[' + type(obj[keys[i]]) + ']'
-            : type(obj[keys[i]]) === 'string' ? '"' + obj[keys[i]] + '"' : obj[keys[i]]) ;
+        _type = type(obj[keys[i]]);
+        tmp.innerHTML = '<span class="cell" title="' + keys[i] + '">' + keys[i] + '</span>' + ' <span class="cell">' +
+            (_type === 'function' || _type === 'object'
+            ? obj[keys[i]] === null ? '<strong>null</strong>' : '[' + (_type.charAt(0).toUpperCase() + _type.slice(1)) + ']'
+            : _type === 'string' ? '"' + obj[keys[i]] + '"' : obj[keys[i]]) ;
         ul.appendChild(tmp);
     }
 
     document.body.appendChild(ul);
+
+    posObj[_id] = {
+        left : posX,
+        top  : posY
+    };
+
+    if(_id && _parentID){
+        relation(_id, _parentID, index || 0);
+        var _li = $(_parentID).getElementsByTagName('li')[index + 1];
+        _li.setAttribute('data-id', _id);
+
+        _li.style.cursor = 'pointer';
+        _li.addEventListener('mouseover', function(){
+            setTimeout(function(){
+                $(_id).style.background = "rgba(235,13,13,.6)";
+                _li.style.background = "rgba(181, 45, 235, .6)";
+            },200)
+        })
+        _li.addEventListener('mouseout', function(){
+            setTimeout(function(){
+                $(_id).style.background = "";
+                _li.style.background = "";
+            },200)
+        });
+    }
+
 
     return {
         left : posX,
@@ -268,7 +328,24 @@ function createEntity(obj, name, deep, _id, _parentID){
 
 }
 
+function getPrevHeight(deep){
+    var list = document.querySelectorAll('[data-deep="' + deep + '"]'),
+        len = list.length,
+        i = 0,
+        height = 0;
+
+    for(; i<len; i++){
+        height += list[i].offsetHeight + 15;
+    }
+
+    return height
+}
+
+/**
+ * 从parentID 到 id划线
+ */
 function relation(id, parentID, index){
+    console.warn('relation:::', id, parentID);
     //var svg = document.createElement('svg');
     var svg = document.getElementById('j-svg');
     //var path = document.createElement('path');
@@ -277,11 +354,12 @@ function relation(id, parentID, index){
     //svg.setAttribute('height', '100%');
     var start = posObj[parentID],
         end = posObj[id];
+
     if(!start || !end){
         return
     }
     var startX = start.left + 200,
-        startY = (start.top + 21 * index + 30),
+        startY = (start.top + 21 * index + 26),
         endX = end.left,
         endY = end.top + 10;
 
@@ -298,9 +376,9 @@ function relation(id, parentID, index){
     // 贝塞尔曲线
     // <path d="M97 336 C288 339 143 55 327 51" />
     // tools http://blogs.sitepointstatic.com/examples/tech/svg-curves/cubic-curve.html
-    // path.setAttribute('d',
-    //     'M' + startX + ',' + startY + ' C' + [endX, startY, startX, endY, endX, endY].join(' ')
-    // )
+    path.setAttribute('d',
+        'M' + startX + ',' + startY + ' C' + [endX, startY, startX, endY, endX, endY].join(' ')
+    )
     path.setAttribute('stroke', "orange");
     path.setAttribute('stroke-width', "1");
     path.setAttribute('fill', "none");
@@ -321,7 +399,7 @@ function relation(id, parentID, index){
             $(id).style.background = "";
             $(parentID).style.background = "";
         },200)
-    })
+    });
     svg.appendChild(path);
     //document.body.appendChild(svg);
 }
