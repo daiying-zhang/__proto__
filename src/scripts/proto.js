@@ -87,6 +87,62 @@ person._id = "CA9238419"
 console.log = function(){};
 
 
+
+
+function $(selector){
+    return document.getElementById(selector);
+    //return document.querySelectorAll(selector);
+}
+
+$.attr = function(elem, key, val){
+    if(typeof key === 'string'){
+        if(val){
+            elem.setAttribute(key, val)
+        }else{
+            return elem.getAttribute(key) || ''
+        }
+    }else if(typeof key === 'object'){
+        var obj = key;
+        for(var _key in obj){
+            if(obj.hasOwnProperty(_key)){
+                elem.setAttribute(_key, obj[_key])
+            }
+        }
+    }
+};
+
+$.drag = function(elem, parent, cb){
+    var sX, sY, sL, sT, el;
+    if(typeof parent !== 'boolean'){
+        cb = parent;
+        parent = true
+    }
+
+    el = parent ? elem.parentNode : elem;
+
+    function moveHandel(eve){
+        var x, y;
+        el.style.left = x = sL + (eve.pageX - sX);
+        el.style.top  = y = sT + (eve.pageY - sY);
+
+        cb && cb.call(el, x, y);
+    }
+    elem.addEventListener('mousedown', function(eve){
+        sX = eve.pageX;
+        sY = eve.pageY;
+        sL = parseInt(el.style.left);
+        sT = parseInt(el.style.top);
+
+        document.addEventListener('mousemove', moveHandel);
+        return false
+    });
+    document.addEventListener('mouseup', function(eve){
+        document.removeEventListener('mousemove', moveHandel)
+    })
+};
+
+
+
 var buildInObjects = [
     Date.prototype,
     Function.prototype,
@@ -95,7 +151,7 @@ var buildInObjects = [
     Number.prototype,
     Boolean.prototype,
     RegExp.prototype
-]
+];
 
 var buildInObjStr = [
     'Date.prototype',
@@ -105,7 +161,7 @@ var buildInObjStr = [
     'Number.prototype',
     'Boolean.prototype',
     'RegExp.prototype'
-]
+];
 
 var objDB = [];
 
@@ -228,6 +284,16 @@ function proto(obj, isProto, from, name, prex, _id, _parentID, index){
 var a = 2;
 var posObj = {};
 
+/**
+ * 创建实体
+ * @param obj
+ * @param name
+ * @param deep
+ * @param _id
+ * @param _parentID
+ * @param index
+ * @returns {{left: number, top: *}}
+ */
 function createEntity(obj, name, deep, _id, _parentID, index){
 
     if(~objDB.indexOf(obj)){
@@ -283,6 +349,18 @@ function createEntity(obj, name, deep, _id, _parentID, index){
     tmp.innerHTML = '<div style="color:red; font-size:14px; text-align:center">' + (name || '') + ' [' + typeof(obj) + ']</div>';
     ul.appendChild(tmp);
 
+    $.drag(tmp, function(x, y){
+        //console.warn($.attr(this, 'import'), $.attr(this, 'export'));
+        var imp = $.attr(this, 'import'),
+            exp = $.attr(this, 'export'),
+            all = (imp ? imp.split('_') : []).concat( exp ? exp.split('_') : []);
+        all.forEach(function(value, index){
+            //console.warn($(value));
+            setPosition($(value))
+        });
+        //console.warn('(', x, ',', y, ')');
+    });
+
     for(; i<len; i++){
         tmp = li.cloneNode();
         _type = type(obj[keys[i]]);
@@ -328,6 +406,11 @@ function createEntity(obj, name, deep, _id, _parentID, index){
 
 }
 
+/**
+ * 获取对应层级实体容器目前的高度
+ * @param deep
+ * @returns {number}
+ */
 function getPrevHeight(deep){
     var list = document.querySelectorAll('[data-deep="' + deep + '"]'),
         len = list.length,
@@ -341,19 +424,22 @@ function getPrevHeight(deep){
     return height
 }
 
-/**
- * 从parentID 到 id划线
- */
-function relation(id, parentID, index){
-    console.warn('relation:::', id, parentID);
-    //var svg = document.createElement('svg');
-    var svg = document.getElementById('j-svg');
-    //var path = document.createElement('path');
-    var path = document.createElementNS("http://www.w3.org/2000/svg", "path")
-    //svg.setAttribute('width', '100%');
-    //svg.setAttribute('height', '100%');
-    var start = posObj[parentID],
-        end = posObj[id];
+function setPosition(path){
+    var relation = $.attr(path, 'relation').split('_'),
+        parentID = relation[1],
+        id = relation[0],
+        index = parseInt($.attr(path, 'index'));
+
+    var start = {
+            left: parseInt($(parentID).style.left),
+            top: parseInt($(parentID).style.top)
+        },  //起
+        end = {
+            left: parseInt($(id).style.left),
+            top: parseInt($(id).style.top)
+        };  //止
+
+    //var svgLineID = Math.guid();
 
     if(!start || !end){
         return
@@ -364,7 +450,51 @@ function relation(id, parentID, index){
         endY = end.top + 10;
 
     // 折现
+    /*path.setAttribute('d',
+     //起点
+     'M ' + startX + ' ' + startY +
+     //下中点
+     ' L ' + (endX + startX) / 2 + ' ' + startY +
+     //上中点
+     ' L ' + (endX + startX) / 2 + ' ' + endY +
+     //终点
+     ' L ' + endX + ' ' + endY);*/
+    // 贝塞尔曲线
+    // <path d="M97 336 C288 339 143 55 327 51" />
+    // tools http://blogs.sitepointstatic.com/examples/tech/svg-curves/cubic-curve.html
     path.setAttribute('d',
+            'M' + startX + ',' + startY + ' C' + [endX, startY, startX, endY, endX, endY].join(' ')
+    );
+}
+
+/**
+ * 从parentID 到 id划线
+ */
+function relation(id, parentID, index){
+    console.warn('relation:::', id, parentID);
+    //var svg = document.createElement('svg');
+    var svg = document.getElementById('j-svg');
+    //var path = document.createElement('path');
+    var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    //svg.setAttribute('width', '100%');
+    //svg.setAttribute('height', '100%');
+
+    //TODO 优化：调用setPosition
+    var start = posObj[parentID],  //起
+        end = posObj[id];          //止
+
+    var svgLineID = Math.guid();
+
+    if(!start || !end){
+        return
+    }
+    var startX = start.left + 200,
+        startY = (start.top + 21 * index + 26),
+        endX = end.left,
+        endY = end.top + 10;
+
+    // 折现
+    /*path.setAttribute('d',
         //起点
         'M ' + startX + ' ' + startY +
         //下中点
@@ -372,20 +502,39 @@ function relation(id, parentID, index){
         //上中点
         ' L ' + (endX + startX) / 2 + ' ' + endY +
         //终点
-        ' L ' + endX + ' ' + endY);
+        ' L ' + endX + ' ' + endY);*/
     // 贝塞尔曲线
     // <path d="M97 336 C288 339 143 55 327 51" />
     // tools http://blogs.sitepointstatic.com/examples/tech/svg-curves/cubic-curve.html
     path.setAttribute('d',
         'M' + startX + ',' + startY + ' C' + [endX, startY, startX, endY, endX, endY].join(' ')
-    )
+    );
+
+    $.attr(path, {
+        'id':  svgLineID,
+        'stroke':  "orange",
+        'stroke-width':  "1",
+        'fill':  "none",
+        'index': index,
+        'marker-end': "url(#markerArrow)",
+        //'stroke-dasharray':  "10 5 5 5",
+        'style': 'cursor:pointer',
+        'relation': id + '_' + parentID
+    });
+
+    var idImport = $.attr($(id), 'import');
+    var idExport = $.attr($(parentID), 'export');
+    $.attr($(id), 'import', idImport ? idImport  + '_' + svgLineID : svgLineID);
+    $.attr($(parentID), 'export', idExport ? idExport  + '_' + svgLineID : svgLineID);
+
+    /*path.setAttribute('id', svgLineID);
     path.setAttribute('stroke', "orange");
     path.setAttribute('stroke-width', "1");
     path.setAttribute('fill', "none");
     path.setAttribute('marker-end',"url(#markerArrow)");
     //path.setAttribute('stroke-dasharray', "10 5 5 5");
     path.setAttribute('style','cursor:pointer');
-    path.setAttribute('relation',id + parentID);
+    path.setAttribute('relation',id + '_' + parentID);*/
     path.addEventListener('mouseover', function(){
         setTimeout(function(){
             $(id).style.background = "rgba(235,13,13,.6)";
@@ -408,24 +557,26 @@ function relation(id, parentID, index){
  * Math.guid
  * from : http://www.broofa.com/2008/09/javascript-uuid-function/
  */
-Math.guid = function(){
+/*Math.guid = function(){
     return 'xxxxxxxx-xxxx-4xxx-yxxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c){
         var r = Math.random() * 16 | 0,
             v = c === 'x' ? r : (r & 0x3 | 0x8);
 
         return v.toString(16)
     }).toUpperCase();
-}
+}*/
+
+Math.guid = (function(){
+    var count = 0;
+    return function(){
+        return ++count;
+    }
+})();
 
 console.log('person:')
 proto(person, false, [],'person', '', Math.guid());
 console.log('over....');
 
-
-function $(selector){
-    return document.getElementById(selector);
-    //return document.querySelectorAll(selector);
-}
 
 // Person:
 // |--name
