@@ -18,6 +18,10 @@ person.person = {
         city: '北京市',
         area : '海淀区'
     },
+    getName: function(){
+        alert(this.name);
+        return this.name;
+    },
     age : 23,
     test: obj,
     department : '机票事业部',
@@ -106,6 +110,23 @@ $.attr = function(elem, key, val){
         for(var _key in obj){
             if(obj.hasOwnProperty(_key)){
                 elem.setAttribute(_key, obj[_key])
+            }
+        }
+    }
+};
+
+$.css = function(elem, key, val){
+    if(typeof key === 'string'){
+        if(val){
+            elem.style[key] = val
+        }else{
+            return elem.style[key] || ''
+        }
+    }else if(typeof key === 'object'){
+        var obj = key;
+        for(var _key in obj){
+            if(obj.hasOwnProperty(_key)){
+                elem.style[_key] =  obj[_key]
             }
         }
     }
@@ -275,7 +296,7 @@ function proto(obj, isProto, from, name, prex, _id, _parentID, index){
                 }
             }
         }catch(e){
-            console.warn('Exception : ', e.message)
+            console.warn('Exception : ', e.message, e)
         }
     });
 }
@@ -295,7 +316,7 @@ var posObj = {};
  * @returns {{left: number, top: *}}
  */
 function createEntity(obj, name, deep, _id, _parentID, index){
-
+    var cls = ['', 'orange', 'red', 'green'];
     if(~objDB.indexOf(obj)){
         //console.warn('cunzai::', obj,_parentID, posDB[objDB.indexOf(obj)]);
         relation(posDB[objDB.indexOf(obj)], _parentID, index)
@@ -326,27 +347,30 @@ function createEntity(obj, name, deep, _id, _parentID, index){
     // document.body.appendChild(title);
     var prevHeight = getPrevHeight(deep);
 
-    console.log('deep', deep, 'height:', prevHeight);
+    //console.log('deep', deep, 'height:', prevHeight);
     var posX = deep * 260 + 10,
         //posY = (deepObj[deep] - 1) * 200 + 20;
         posY = prevHeight + 10;
 
-    ul.className = 'entity';
+    ul.className = 'entity m-entity' + ' ' + cls[deep % cls.length];
 
-    ul.style.position = 'absolute';
-    ul.style.width = '200px';
-    ul.style.top = posY;
-    ul.style.left = posX;
-    ul.style.overflow = 'scroll';
-    ul.style.border = '1px solid black';
+    $.css(ul, {
+        'position' : 'absolute',
+        'width' : '200px',
+        'top' : posY,
+        'left' : posX,
+        'overflow' : 'scroll',
+        'border' : '1px solid black'
+    });
 
     ul.setAttribute('data-deep', deep);
 
     ul.id = _id;
 
     tmp = li.cloneNode();
-    tmp.style.background = '#BEF4AA';
-    tmp.innerHTML = '<div style="color:red; font-size:14px; text-align:center">' + (name || '') + ' [' + typeof(obj) + ']</div>';
+    tmp.className = 'title';
+    //tmp.style.background = '#BEF4AA';
+    tmp.innerHTML = '<div style="font-size:14px; text-align:center">' + (name || '') + ' [' + typeof(obj) + ']</div>';
     ul.appendChild(tmp);
 
     $.drag(tmp, function(x, y){
@@ -363,6 +387,7 @@ function createEntity(obj, name, deep, _id, _parentID, index){
 
     for(; i<len; i++){
         tmp = li.cloneNode();
+        tmp.className = 'content';
         _type = type(obj[keys[i]]);
         tmp.innerHTML = '<span class="cell" title="' + keys[i] + '">' + keys[i] + '</span>' + ' <span class="cell">' +
             (_type === 'function' || _type === 'object'
@@ -428,15 +453,17 @@ function setPosition(path){
     var relation = $.attr(path, 'relation').split('_'),
         parentID = relation[1],
         id = relation[0],
+        $parent = $(parentID),
+        $cur = $(id),
         index = parseInt($.attr(path, 'index'));
 
     var start = {
-            left: parseInt($(parentID).style.left),
-            top: parseInt($(parentID).style.top)
+            left: parseInt($.css($parent, 'left')),
+            top: parseInt($.css($parent, 'top'))
         },  //起
         end = {
-            left: parseInt($(id).style.left),
-            top: parseInt($(id).style.top)
+            left: parseInt($.css($cur, 'left')),
+            top: parseInt($.css($cur, 'top'))
         };  //止
 
     //var svgLineID = Math.guid();
@@ -445,12 +472,12 @@ function setPosition(path){
         return
     }
     var startX = start.left + 200,
-        startY = (start.top + 21 * index + 26),
+        startY = (start.top + 23 * index + 33),
         endX = end.left,
-        endY = end.top + 10;
+        endY = end.top + 13;
 
-    // 折现
-    /*path.setAttribute('d',
+    // 折线
+    path.setAttribute('d',
      //起点
      'M ' + startX + ' ' + startY +
      //下中点
@@ -458,20 +485,20 @@ function setPosition(path){
      //上中点
      ' L ' + (endX + startX) / 2 + ' ' + endY +
      //终点
-     ' L ' + endX + ' ' + endY);*/
+     ' L ' + endX + ' ' + endY);
     // 贝塞尔曲线
     // <path d="M97 336 C288 339 143 55 327 51" />
     // tools http://blogs.sitepointstatic.com/examples/tech/svg-curves/cubic-curve.html
-    path.setAttribute('d',
+    /*path.setAttribute('d',
             'M' + startX + ',' + startY + ' C' + [endX, startY, startX, endY, endX, endY].join(' ')
-    );
+    );*/
 }
 
 /**
  * 从parentID 到 id划线
  */
 function relation(id, parentID, index){
-    console.warn('relation:::', id, parentID);
+    //console.warn('relation:::', id, parentID);
     //var svg = document.createElement('svg');
     var svg = document.getElementById('j-svg');
     //var path = document.createElement('path');
@@ -479,8 +506,7 @@ function relation(id, parentID, index){
     //svg.setAttribute('width', '100%');
     //svg.setAttribute('height', '100%');
 
-    //TODO 优化：调用setPosition
-    var start = posObj[parentID],  //起
+    /*var start = posObj[parentID],  //起
         end = posObj[id];          //止
 
     var svgLineID = Math.guid();
@@ -493,26 +519,20 @@ function relation(id, parentID, index){
         endX = end.left,
         endY = end.top + 10;
 
-    // 折现
-    /*path.setAttribute('d',
-        //起点
-        'M ' + startX + ' ' + startY +
-        //下中点
-        ' L ' + (endX + startX) / 2 + ' ' + startY +
-        //上中点
-        ' L ' + (endX + startX) / 2 + ' ' + endY +
-        //终点
-        ' L ' + endX + ' ' + endY);*/
-    // 贝塞尔曲线
-    // <path d="M97 336 C288 339 143 55 327 51" />
-    // tools http://blogs.sitepointstatic.com/examples/tech/svg-curves/cubic-curve.html
     path.setAttribute('d',
         'M' + startX + ',' + startY + ' C' + [endX, startY, startX, endY, endX, endY].join(' ')
-    );
+    );*/
+    var $parent = $(parentID),
+        $cur = $(id);
 
+    if(!$parent || !$cur){
+        return
+    }
+
+    var svgLineID = Math.guid();
     $.attr(path, {
         'id':  svgLineID,
-        'stroke':  "orange",
+        'stroke':  "black",
         'stroke-width':  "1",
         'fill':  "none",
         'index': index,
@@ -521,6 +541,8 @@ function relation(id, parentID, index){
         'style': 'cursor:pointer',
         'relation': id + '_' + parentID
     });
+
+    setPosition(path);
 
     var idImport = $.attr($(id), 'import');
     var idExport = $.attr($(parentID), 'export');

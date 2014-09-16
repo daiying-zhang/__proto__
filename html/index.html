@@ -3,6 +3,21 @@
         <title>Hello __proto__</title>
     </head>
     <meta charset="utf-8"/>
+    <style>
+        .m-entity{ font-family: "PT Mono",monaco, sans-serif; font-size: 14px; border-radius: /*3px 3px 0 */0 }
+        .m-entity .title{background: #2278B8; color: white; height: 26px; line-height:26px; font-size:14px; text-align:center}
+        .m-entity .content{background: #95D1F7}
+        .m-entity .cell{ line-height: 22px; height: 22px; }
+
+        .m-entity.orange .title{background: #FF8C00; color: white}
+        .m-entity.orange .content{background: #FFD89E}
+
+        .m-entity.red .title{background: #DA0017; color: white}
+        .m-entity.red .content{background: #F4A4AC}
+
+        .m-entity.green .title{background: #009B44; color: white}
+        .m-entity.green .content{background: #86E1BD}
+    </style>
     <style media="screen">
         body{ font-family: monaco; white-space: nowrap; }
         ul.entity{ padding:0; margin:0; box-shadow: 2px 2px 7px rgba(0,0,0,.6);}
@@ -14,13 +29,13 @@
         <div id="main">
 
         </div>
-        <svg id="j-svg" width="100%" height="100%" style="position:absolute; z-index:0; left:0; top:0;border: 1px dashed orange">
+        <svg id="j-svg" width="100%" height="100%" style="position:absolute; z-index:0; left:0; top:0;border: 0px dashed orange">
             <defs>
                 <marker id="markerArrow" markerWidth="10" markerHeight="8"
                         markerUtil="strokeWidth" orient="auto"
                         refx='10' refy='4'
                     >
-                    <path d="M0 0 L 10 4 M 0 8 L 10 4" stroke="orange" stroke-dasharray="10 5 5 5" fill="none" />
+                    <path d="M0 0 L 10 4 M 0 8 L 10 4" stroke="black" stroke-dasharray="10 5 5 5" fill="none" />
                     <!-- <path d="M0 0 L 10 4 M 0 8 L 10 4 M 10 4 L 0 4" stroke="orange" stroke-dasharray="10 5 5 5" fill="none" /> -->
                     <!-- <path d="M0 0 L 10 4 L 0 8 M 10 4 L 0 4" stroke="orange" stroke-dasharray="10 5 5 5" fill="none" /> -->
                 </marker>
