@@ -41,14 +41,19 @@ define(function () {
          * @param type
          * @example
          *    eve.trigger('click', param1, param2)
+         *    eve.trigger('click', [param1, param2])
          */
         trigger : function(type){
             if(!type){return}
             var hs = this._handels[type], len, i = 0;
             if(hs && (len = hs.length)){
                 for(; i<len; i++){
-                    //TODO the first params should be the event object
-                    hs[i].apply(this, [].slice.call(arguments, 1))
+                    if(arguments.length === 2
+                        && Object.prototype.toString.call(arguments[1]) === '[object Array]'){
+                        hs[i].apply(this, arguments[1])
+                    }else{
+                        hs[i].apply(this, [].slice.call(arguments, 1))
+                    }
                 }
             }
         }

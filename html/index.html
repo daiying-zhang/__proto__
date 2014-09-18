@@ -17,6 +17,22 @@
 
         .m-entity.green .title{background: #009B44; color: white}
         .m-entity.green .content{background: #86E1BD}
+
+        .m-entity.current .cell{ background: red; }
+
+        .pathAnimation {
+            stroke-dasharray: 10 3 2 3;
+            -webkit-animation: dash 5s linear infinite;
+        }
+
+        @-webkit-keyframes dash {
+            from{
+                stroke-dashoffset: 100
+            }
+            to{
+                stroke-dashoffset: 0;
+            }
+        }
     </style>
     <style media="screen">
         body{ font-family: monaco; white-space: nowrap; }
@@ -29,13 +45,13 @@
         <div id="main">
 
         </div>
-        <svg id="j-svg" width="100%" height="100%" style="position:absolute; z-index:0; left:0; top:0;border: 0px dashed orange">
+        <svg id="j-svg" width="1016px" height="1100%" style="position:absolute; z-index:0; left:0; top:0;border: 0px dashed orange">
             <defs>
                 <marker id="markerArrow" markerWidth="10" markerHeight="8"
                         markerUtil="strokeWidth" orient="auto"
-                        refx='10' refy='4'
+                        refx='0' refy='4'
                     >
-                    <path d="M0 0 L 10 4 M 0 8 L 10 4" stroke="black" stroke-dasharray="10 5 5 5" fill="none" />
+                    <path id="arrow" d="M0 0 L 10 4 M 0 8 L 10 4 M 0 4 L10 4" stroke="black" stroke-dasharray="10 5 5 5" fill="none" />
                     <!-- <path d="M0 0 L 10 4 M 0 8 L 10 4 M 10 4 L 0 4" stroke="orange" stroke-dasharray="10 5 5 5" fill="none" /> -->
                     <!-- <path d="M0 0 L 10 4 L 0 8 M 10 4 L 0 4" stroke="orange" stroke-dasharray="10 5 5 5" fill="none" /> -->
                 </marker>

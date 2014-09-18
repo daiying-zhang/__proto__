@@ -3,81 +3,22 @@
  * @author daiying.zhang
  */
 (function(window, undefined){
-define(["lib/Event"],
-    function(Event){
-        function Mo(){
-
-        }
-
-        Mo.prototype = Mo.fn = {
-            constructor: Mo,
-            initialize: function(){
-
-            }
-        };
-
-        /**
-         * extend
-         * @param deep
-         * @param target
-         * @param source
-         * @returns {*}
-         */
-        Mo.extend = function(deep, target, source/*, source1, source2, ...*/){
-            var tmp, type, args = [].slice.call(arguments, 0), len = args.length, i = 2;
-            // .extend(target, source, ...)
-            if(typeof deep !== 'boolean'){
-                //source = target;
-                target = deep;
-                deep = false;
-                i = 1;
-            }
-
-            for(; i<len; i++){
-                source = args[i];
-                for(var key in source){
-                    // deep clone
-                    if(deep){
-                        if(source.hasOwnProperty(key)){
-                            type = Mo.type(tmp = source[key]);
-                            if(/^(object|array)$/.test(type)){
-                                target[key] = target[key] ? target[key] :
-                                        type === 'object' ? {} : [];
-                                Mo.extend(true, target[key] , tmp)
-                            }else{
-                                target[key] = tmp
-                            }
-                        }
-                    }else{
-                        if(source.hasOwnProperty(key)){
-                            target[key] = source[key]
-                        }
-                    }
-                }
-            }
-            return target
-        };
-
-        Mo.extend(Mo, {
-            type: function(obj){
-                return obj === null ? 'null' :
-                    Object.prototype.toString.call(obj).replace(/^\[object (\w+)\]$/, '$1').toLowerCase()
-            }
-        });
-
+define(["lib/core","lib/Event"],
+    function(Mo, Event){
         var Model = {
             initialize: function(){
                 console.log('Model initialize...');
                 return this
             },
             load: function(){
-
+                // TODO load data from remote
             },
             update: function(){
-
+                //TODO update remote
             },
             addItem: function(item){
-                this.getList().push(item)
+                var len = this.getList().push(item);
+                this.trigger('additem', [item, this.getList()]);
             },
             removeItem: function (index) {
                 var list = this.getList();

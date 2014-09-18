@@ -13,7 +13,9 @@ require(['lib/M'], function(Mo){
     var m = Mo.M.create({
         initialize: function(){ console.log('initialize :)'); }
      });
-     console.dir(window.m = m)
+     m.on('additem', function(item, list){console.log(item, list)});
+     m.addItem({a:1});
+     window.m = m
 
     // test controller
     /*var c = Mo.Controller.create(null, null, {
