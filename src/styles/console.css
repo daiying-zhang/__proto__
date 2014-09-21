@@ -1,0 +1,9 @@
+/**
+ * @fileOverview 
+ */
+
+#log{ min-height:100px; max-height:200px; width:100%; overflow:auto; font: 14px/20px Monaco;position: fixed; z-index:2; background:white; left: 0; bottom: 0;}
+#log:after{ content: 'Console'; font-family: 'Monaco'; font-size: 30px; color: #E6E6E6; position: absolute;top: 24px;right: 16px;z-index: -1;font-style: italic;}
+#log ul{  padding: 5px 0; margin:10px; min-height: 36px; border: 1px solid #E6E6E6; border-radius: 2px; }
+#log ul li{ list-style:none }
+#log b.arrow:before{font-family: monospace;font-size: 14px;line-height: 14px;content: '❯';color: #3583FC;font-weight: bold;margin-left: 5px; margin-right:5px;}

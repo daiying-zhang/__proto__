@@ -91,13 +91,9 @@ person._id = "CA9238419"*/
     console.log = function(){};
 
     function loadJQ() {
-        var script = document.createElement('script');
-        script.src = 'http://code.jquery.com/jquery-2.1.0.min.js'
-        document.getElementsByTagName('head')[0].appendChild(script)
-
-        setTimeout(function(){
+        $.loadScript('http://code.jquery.com/jquery-2.1.0.min.js', function(){
             proto(jQuery, false, [],'jQuery', '', Math.guid());
-        },500)
+        })
     }
 
 
@@ -153,7 +149,6 @@ person._id = "CA9238419"*/
             var x, y;
             el.style.left = x = sL + (eve.pageX - sX);
             el.style.top  = y = sT + (eve.pageY - sY);
-
             cb && cb.call(el, x, y);
         }
         elem.addEventListener('mousedown', function(eve){
@@ -173,9 +168,33 @@ person._id = "CA9238419"*/
     $.type = function(obj) {
         return obj === null ? 'null' :
             toString.call(obj).replace(/^\[object (\w+)\]$/, '$1')//.toLowerCase()
-    }
+    };
 
+    $.globalEval = function(code) {
+        var sc = document.createElement('script');
+        sc.text = code;
+        document.head.appendChild(sc).parentNode.removeChild(sc);
+    };
 
+    $.loadScript = function(src, cbk){
+        var iHead = document.head;
+        var iScript= document.createElement("script");
+        iScript.addEventListener('load', function(){
+            cbk && cbk()
+        });
+        iScript.type = "text/javascript";
+        iScript.src=src;
+        iHead.appendChild(iScript);
+    };
+
+    $.loadStyle = function(src){
+        var node = document.createElement('link');
+        node.rel = 'stylesheet';
+        node.href = src;
+        document.head.appendChild(node);
+    };
+
+    window.__ = $;
 
     var buildInObjects = [
         Date.prototype,
@@ -250,8 +269,12 @@ person._id = "CA9238419"*/
      */
     function proto(obj, isProto, from, name, prex, _id, _parentID, index){
         var keys, curr, currPrex, len, objType, buildObjIndex;
-        prex = prex || '';
+
+        isProto = isProto || false;
         from = from || [];
+        name = name || $.type(obj);
+        prex = prex || '';
+        _id = _id || Math.guid();
 
         //console.warn('from' ,from)
 
@@ -367,8 +390,9 @@ person._id = "CA9238419"*/
         var posX = deep * 260 + 10,
         //posY = (deepObj[deep] - 1) * 200 + 20;
             posY = prevHeight + 10;
+        var title;
 
-        ul.className = 'entity m-entity' + ' ' + cls[deep % cls.length];
+        ul.className = 'entity m-entity j-entity' + ' ' + cls[deep % cls.length];
 
         $.css(ul, {
             'position' : 'absolute',
@@ -383,23 +407,12 @@ person._id = "CA9238419"*/
 
         ul.id = _id;
 
-        tmp = li.cloneNode();
+        tmp = title = li.cloneNode();
         tmp.className = 'title';
         //tmp.style.background = '#BEF4AA';
         tmp.innerHTML = '<div style="font-size:14px; text-align:center">' + (name || '') + ' [' + $.type(obj) + ']</div>';
         ul.appendChild(tmp);
 
-        $.drag(tmp, function(x, y){
-            //console.warn($.attr(this, 'import'), $.attr(this, 'export'));
-            var imp = $.attr(this, 'import'),
-                exp = $.attr(this, 'export'),
-                all = (imp ? imp.split('_') : []).concat( exp ? exp.split('_') : []);
-            all.forEach(function(value, index){
-                //console.warn($(value));
-                setPosition($(value))
-            });
-            //console.warn('(', x, ',', y, ')');
-        });
 
         for(; i<len; i++){
             tmp = li.cloneNode();
@@ -412,7 +425,20 @@ person._id = "CA9238419"*/
             ul.appendChild(tmp);
         }
 
+        //document.getElementById('main').appendChild(ul);
         document.body.appendChild(ul);
+
+        $.drag(title, function(x, y){
+            //console.warn($.attr(this, 'import'), $.attr(this, 'export'));
+            var imp = $.attr(this, 'import'),
+                exp = $.attr(this, 'export'),
+                all = (imp ? imp.split('_') : []).concat( exp ? exp.split('_') : []);
+            all.forEach(function(value, index){
+                //console.warn($(value));
+                setPosition($(value))
+            });
+            //console.warn('(', x, ',', y, ')');
+        });
 
         posObj[_id] = {
             left : posX,
@@ -501,7 +527,8 @@ person._id = "CA9238419"*/
 
         //var svgLineID = Math.guid();
 
-        if(!start || !end){
+
+        /*if(!start || !end){
             return
         }
         var startX = start.left + 201,
@@ -517,6 +544,94 @@ person._id = "CA9238419"*/
                 ' L ' + (endX + startX) / 2 + ' ' + startY +
                 //上中点
                 ' L ' + (endX + startX) / 2 + ' ' + endY +
+                //终点
+                ' L ' + endX + ' ' + endY);
+        // 贝塞尔曲线
+        // <path d="M97 336 C288 339 143 55 327 51" />
+        // tools http://blogs.sitepointstatic.com/examples/tech/svg-curves/cubic-curve.html
+        path.setAttribute('d',
+                'M' + startX + ',' + startY + ' C' + [endX, startY, startX, endY, endX, endY].join(' ')
+        );*/
+
+
+
+        if(!start || !end){
+            return
+        }
+        var startX = start.left + 201,
+            startY = (start.top + 22 * index + 37),
+            endX = end.left - 10,
+            endY = end.top + 13;
+        var p1, p2, p3, p4;
+
+        var isRightDir = endX > startX;
+        var isTopDir = endY > startY;
+
+        if(!isRightDir){
+            endX = end.left + 215;
+            if(endY > start.top){
+                endY = start.top - 10;
+                p3 = {
+                    x: endX + 10,
+                    y: start.top - 10
+                };
+                p1 = {
+                    x: Math.max(startX, endX) + 10,
+                    y: startY
+                };
+                p2 = {
+                    x: Math.max(startX, endX) + 10,
+                    y: endY
+                };
+
+                endY = end.top + 13;
+
+                p4 = {
+                    x: endX + 10,
+                    y: endY
+                }
+            }else{
+                p1 = {
+                    x: Math.max(startX, endX) + 10,
+                    y: startY
+                };
+                p2 = {
+                    x: isRightDir ? (endX + startX) / 2 : Math.max(startX, endX) + 10,
+                    y: endY
+                };
+            }
+        }else{
+            p1 = {
+                x: (endX + startX) / 2,
+                y: startY
+            };
+            p2 = {
+                x: (endX + startX) / 2,
+                y: endY
+            };
+        }
+
+        /*p1 = {
+            x: isRightDir ? (endX + startX) / 2 : Math.max(startX, endX) + 10,
+            y: startY
+        };*/
+
+        /*p2 = {
+            x: isRightDir ? (endX + startX) / 2 : Math.max(startX, endX) + 10,
+            y: endY
+        };*/
+
+
+        // 折线
+        path.setAttribute('d',
+            //起点
+                'M ' + startX + ' ' + startY +
+                //下中点
+                ' L ' + p1.x + ' ' + p1.y +
+                //上中点
+                ' L ' + p2.x + ' ' + p2.y +
+                (p3 ? (' L ' + p3.x + ' ' + p3.y) : '') +
+                (p4 ? (' L ' + p4.x + ' ' + p4.y) : '') +
                 //终点
                 ' L ' + endX + ' ' + endY);
         // 贝塞尔曲线
@@ -572,7 +687,8 @@ person._id = "CA9238419"*/
             'marker-end': "url(#markerArrow)",
             //'stroke-dasharray':  "10 5 5 5",
             'style': 'cursor:pointer',
-            'relation': id + '_' + parentID
+            'relation': id + '_' + parentID,
+            'class': 'arrow-path'
         });
 
         setPosition(path);
@@ -633,10 +749,58 @@ person._id = "CA9238419"*/
     //proto(person, false, [],'person', '', Math.guid());
     console.log('over....');
 
-    loadJQ()
+    var person = {
+        "name": "daiying.zhang",
+        "age": 24,
+        "address":{
+            "province": "BeiJing",
+            "city": "HaiDian"
+        }
+    }
+
+    window.proto = proto;
+    window.p = function() {
+        var //paths = [].slice.call(document.getElementsByClassName('j-entity')),
+            paths = [].slice.call(document.querySelectorAll('.j-entity, .arrow-path')),
+            i = 0,
+            len = paths.length;
+        var svg = document.getElementById('j-svg'),
+            ent = document.getElementById('main');
+        for(; i<len; i++){
+            paths[i].parentNode.removeChild(paths[i])
+        }
+
+        //ent.innerHTML = '';
+        $.css($('j-svg'), {
+            'width':  '100%',
+            'height': '100%'
+        })
+        $('j-editor').style.display = 'none';
+        proto.apply(this, arguments);
+        setTimeout(function(){
+            var sw = document.body.scrollWidth,
+                ow = document.body.offsetWidth,
+                sh = document.body.scrollHeight,
+                oh = document.body.offsetHeight;
+            $.css($('j-svg'), {
+                'width': sw + 'px',
+                'height': sh + 'px'
+            })
+        }, 0)
+    };
+    //proto(person, false, [],'person', '', Math.guid());
+
+
+
+    //loadJQ()
     /*setTimeout(function() {
         console.warn('jQuery', jQuery, '$', $, $ === jQuery);
     }, 3000)*/
+    $.loadJQ = function(show){
+        $.loadScript('http://localhost/scripts/jquery.js', function(){
+            show ? p(jQuery) : alert('加载成功');
+        })
+    }
 })()
 
 // Person:
