@@ -194,6 +194,19 @@ person._id = "CA9238419"*/
         document.head.appendChild(node);
     };
 
+    $.data = function(ele, key, data){
+        var id = ele._id;
+        if(typeof data === 'undefined'){
+            return id ? $._cache[id][key] : null
+        }
+        ele._id = id ? id : id = Math.guid();
+
+        $._cache[id] = $._cache[id] || {};
+        $._cache[id][key] = data;
+    };
+    $.id = '$' + (String(Math.random())).replace(/\W/g,'');
+    $._cache = {};
+
     window.__ = $;
 
     var buildInObjects = [
@@ -319,13 +332,17 @@ person._id = "CA9238419"*/
                         createEntity(curr, buildInObjStr[buildObjIndex], from.length + 1, Math.guid(), _id, idx);
                         return
                     }
-
                     //检测循环依赖
                     if(!checkCircleDependence(curr, from)){
                         // 递归处理对象
                         // 如果第一级增加两个个空格， 最后一级增加三个空格，其他增加'|  '
-                        proto(curr, ele === '__proto__' || objType === 'function',
-                            from.concat(obj),
+                        var __from = from.concat();
+                        __from.push(obj);
+                        proto(curr,
+                            ele === '__proto__' || objType === 'function',
+                            //from.concat(obj),
+                            //from.push(obj),
+                            __from,
                             ele, prex + (prex === '' ? '  ' : (idx === len - 1 ? '   ' : '|  '))
                             ,Math.guid(), _id, idx
                         )
@@ -341,7 +358,6 @@ person._id = "CA9238419"*/
     }
 
 //var deepObj = {};
-    var a = 2;
     var posObj = {};
 
     /**
@@ -418,10 +434,14 @@ person._id = "CA9238419"*/
             tmp = li.cloneNode();
             tmp.className = 'content';
             _type = type(obj[keys[i]]);
-            tmp.innerHTML = '<span class="cell" title="' + keys[i] + '">' + keys[i] + '</span>' + ' <span class="cell">' +
+            tmp.innerHTML = '<span class="cell" title="' + keys[i] + '">' + keys[i] + '</span>' +
+                ' <span class="cell j-tips" title="' +
+                /*(_type === 'function' ? String(obj[keys[i]]) : JSON.stringify(obj[keys[i]])).substr(0, 100).replace(/"$/,'') +*/ '">' +
                 (_type === 'function' || _type === 'object'
                     ? obj[keys[i]] === null ? '<strong>null</strong>' : '[' + (_type.charAt(0).toUpperCase() + _type.slice(1)) + ']'
-                    : _type === 'string' ? '"' + obj[keys[i]] + '"' : obj[keys[i]]) ;
+                    : _type === 'string' ? '"' + obj[keys[i]] + '"' : obj[keys[i]]) + '</span>' ;
+            $.data(tmp, 'tips', _type === 'function' ? String(obj[keys[i]]) : JSON.stringify(obj[keys[i]]));
+            tmp.addEventListener('click', tips);
             ul.appendChild(tmp);
         }
 
@@ -464,7 +484,7 @@ person._id = "CA9238419"*/
                     //$('arrow').setAttribute('stroke', 'red')
                     //$(iidd).setAttribute('stroke-width', '2')
                 },0)
-            })
+            });
             _li.addEventListener('mouseout', function(){
                 $(_id).className = $(_id).className.replace(/\s*current/g,'');
                 setTimeout(function(){
@@ -760,6 +780,10 @@ person._id = "CA9238419"*/
 
     window.proto = proto;
     window.p = function() {
+        objDB = [];
+        posDB = [];
+        posObj = {};
+
         var //paths = [].slice.call(document.getElementsByClassName('j-entity')),
             paths = [].slice.call(document.querySelectorAll('.j-entity, .arrow-path')),
             i = 0,
@@ -796,11 +820,21 @@ person._id = "CA9238419"*/
     /*setTimeout(function() {
         console.warn('jQuery', jQuery, '$', $, $ === jQuery);
     }, 3000)*/
+
+    function tips(eve) {
+        var tar = eve.target,
+            nodeName = tar.nodeName.toLowerCase();
+        if(nodeName !== 'svg' && ~eve.target.className.indexOf('j-tips')){
+            alert($.data(eve.target.parentNode, 'tips'))
+        }
+    }
     $.loadJQ = function(show){
         $.loadScript('http://localhost/scripts/jquery.js', function(){
-            show ? p(jQuery) : alert('加载成功');
+            show ? p(jQuery) : console.warn('加载成功');
         })
-    }
+    };
+
+    $.loadJQ();
 })()
 
 // Person:

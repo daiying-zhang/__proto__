@@ -22,8 +22,9 @@ var ed = document.getElementById('ed_bak');
 var ed_show = document.getElementById('ed');
 ed.addEventListener('input', function(eve){
     //if(!eve.keyCode.toString().match(/(37|38|39|40)/)){
-        //ed.innerHTML = ed.innerHTML.replace(/<br.*>/g, '\n').replace(/<.*>/g, '');
-        ed_show.innerHTML = highlight(ed.innerHTML);
+        //ed.innerHTML = ed.textContent.replace(/\n/g, '<br/>');
+        //console.warn(ed.textContent.replace(/\n/g, '<br/>'));
+        ed_show.innerHTML = highlight(ed.value).replace(/\n/g, '<br/>').replace(/<br\/?>$/, '<br/>&nbsp;');
 
         /*var range = document.createRange();
         var sel = window.getSelection();
@@ -33,6 +34,9 @@ ed.addEventListener('input', function(eve){
         sel.addRange(range);*/
         setPos()
     //}
+});
+
+ed.addEventListener('paste', function(eve){
 });
 
 ed.addEventListener('keydown', function(eve) {
