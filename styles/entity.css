@@ -1,0 +1,32 @@
+/**
+ * @fileOverview entity styles
+ * @author daiying.zhang
+ */
+
+ul.m-entity{ position:absolute; padding:0; margin:0; box-shadow: 2px 2px 7px rgba(0,0,0,.6);
+    border: 1px solid black; border-radius: 4px; overflow: hidden;}
+ul.m-entity li{ list-style:none; font-size:0;}
+.m-entity .cell{ font-size: 13px; border-top: 1px solid black; border-left: 1px solid black; margin: -1px 0 0 -1px;
+    display:inline-block; width:50%; text-align:center; height: 20px;overflow: hidden;text-overflow: ellipsis;}
+
+.m-entity{ width: 200px; font-family: "PT Mono",monaco, sans-serif; font-size: 14px; border-radius: /*3px 3px 0 */0 }
+.m-entity .title{background: #2278B8; color: white; height: 26px; line-height:26px; font-size:14px; cursor: move; text-align:center}
+.m-entity .content{background: #95D1F7}
+.m-entity .cell{ line-height: 22px; height: 22px; }
+
+.m-entity.orange .title{background: #FF8C00; color: white}
+.m-entity.orange .content{background: #FFD89E}
+
+.m-entity.red .title{background: #DA0017; color: white}
+.m-entity.red .content{background: #F4A4AC}
+
+.m-entity.green .title{background: #009B44; color: white}
+.m-entity.green .content{background: #86E1BD}
+
+.m-entity.highlight .cell{ background: red; }
+.m-entity.blur{ -webkit-filter: blur(2px); opacity: 0.3; }
+
+.m-entity .string:before, .m-entity .string:after{
+    display: inline-block;
+    content: "\"";
+}

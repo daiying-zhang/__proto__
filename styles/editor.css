@@ -1,0 +1,25 @@
+/**
+ * @fileOverview editor styles
+ * @author daiying.zhang
+ */
+
+.m-editor{width: 860px; height: 480px; z-index:1001; border-radius:4px; background:#393939; position:fixed; left:50%; top:50%; margin: -240px 0 0 -430px;}
+.m-editor ::selection{ background: red; }
+.m-editor .ed_bak{white-space: pre; position:absolute; left:0; top:26px; height: 415px; width: 800px; opacity:0.3;resize: none; background: none; border: none; padding: 0; font-family: monaco; font-size: 16px;}
+.m-editor .main{white-space:pre; margin: 4px 10px 10px 50px; height: 415px; width: 800px; overflow:scroll; outline:none; color: white; font-family: PT Mono, Monaco; font-size: 15px;line-height: 21px;}
+.m-editor .line-number{ font-size: 13px; line-height:21px; color: #9A9A9A; position: absolute; left: 0; top: 22px; width: 40px; height: 415px; overflow: hidden; text-align:right; background: transparent; border-right: 1px dashed gray; padding-right: 4px;}
+.m-editor .before{color: #B5822E; position: relative;}
+.m-editor .before .eval-type{ position: absolute; top: 3px; right: 5px; color: white; }
+.m-editor .before:before{ white-space:pre; display:block; content:"<script>"; width:100px; margin: 8px 0 0 5px;}
+.m-editor .before.clours:before{white-space:pre; display: block; content:";(function(window){\A"; margin: 8px 0 0 5px; }
+.m-editor .after{ color:#B5822E;}
+.m-editor .after:before{white-space:pre; display:block; content:"</script>"; width:100px; margin: 5px 0 0 5px;}
+.m-editor .after.clours:before{white-space:pre; display:block; content:"})(this)"; width:100px; margin: 5px 0 0 5px;}
+.m-editor .run{ /*display:none; */ background: #ff3824; /* Old browsers */
+    background: -moz-linear-gradient(top, #ff3824 0%, #ff2851 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ff3824), color-stop(100%,#ff2851)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top, #ff3824 0%,#ff2851 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top, #ff3824 0%,#ff2851 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top, #ff3824 0%,#ff2851 100%); /* IE10+ */
+    background: linear-gradient(to bottom, #ff3824 0%,#ff2851 100%); /* W3C */ padding: 5px 25px; border-radius: 5px; color:white; float: right; margin: -27px 4px 0 0; }
+.m-editor .arrow{ display: inline-block; width: 0; height: 0; border: 8px dashed transparent; border-left-color: white; margin: 0 0 0 4px; position: relative; top: 2px; right: -5px;}

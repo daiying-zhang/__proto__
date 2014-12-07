@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>__proto__</title>
+    <link rel="stylesheet" href="../styles/index.css"/>
+</head>
+<body>
+<svg id="j-svg" style="width:1px; height: 1px; position:absolute; z-index:1000; overflow: visible; left:0; top:0;border: 0px dashed orange">
+    <defs>
+        <marker id="markerArrow" markerWidth="10" markerHeight="8"
+                markerUtil="strokeWidth" orient="auto"
+                refx='0' refy='4'
+                >
+            <path id="arrow" d="M0 0 L 10 4 M 0 8 L 10 4 M 0 4 L10 4" stroke="black" stroke-dasharray="10 5 5 5" fill="none" />
+            <!-- <path d="M0 0 L 10 4 M 0 8 L 10 4 M 10 4 L 0 4" stroke="orange" stroke-dasharray="10 5 5 5" fill="none" /> -->
+            <!-- <path d="M0 0 L 10 4 L 0 8 M 10 4 L 0 4" stroke="orange" stroke-dasharray="10 5 5 5" fill="none" /> -->
+        </marker>
+    </defs>
+     <!--<path id="arrow" style="cursor:pointer" d="M100 100 L 200 200" marker-end="url(#markerArrow)" stroke="orange" stroke-width="1" />-->
+</svg>
+<div class="m-editor" id="j-editor">
+    <div class="before" id="before">
+        <div class="eval-type" id="j-eval-type">
+            <label>
+                <input type="radio" id="j-eval-type-global" name="evalType" value="0" checked/>global
+            </label>
+            <label>
+                <input type="radio" id="j-eval-type-closure" name="evalType" value="1"/>closure
+            </label>
+        </div>
+        <div class="line-number" id="j-line-number">
+        </div>
+    </div>
+    <div class="main" contenteditable="false" id="ed">
+    </div>
+    <textarea class="main ed_bak" id="ed_bak">
+/**
+ * 绘制实体关系图
+ * @name __.draw
+ * @param {Object} obj          要展示的实体对象
+ * @param {String} title        要展示的实体标题，如果实体有name属性，优先取name
+ * @param {Number} [deep=0]     当前层级
+ * @param {Entity} parent       当前的父级实体base
+ * @param {Number} [index=0]    当前实体对应的key(在base的keys中)的序号
+ * @param {Boolean} showProto   是否现实原型对象
+ */
+
+function Person(name, age){
+    this.name = name;
+    this.age = age;
+}
+
+Person.prototype.setName = function(name){
+    this.name = name
+}
+Person.prototype.setAge = function(age){
+    this.age = age
+}
+
+Person.id = Math.random();
+Person.cache = {};
+
+var person = new Person("Lily", 18);
+__.clear().draw(person, "Lily", 0, null, 0, true)
+    </textarea>
+    <div class="after" id="after"></div>
+    <div class="run" id="run">Run<i class="arrow"></i></div>
+</div>
+<script src="../scripts/extensions.js"></script>
+<script src="../scripts/M.js"></script>
+<script src="../scripts/Event.js"></script>
+<script src="../scripts/dom.js"></script>
+<script src="../scripts/relation.js"></script>
+<script src="../scripts/entity.js"></script>
+<script src="../scripts/proto.js"></script>
+<script src="../scripts/editor.js"></script>
+<script>
+    var A = {
+        "name" : "A",
+        "A0" : 12345,
+        "A1" : true,
+        "A2" : "Some Text",
+        "A3" : "Will be B",
+        "A4" : function (){ console.log("A.A4 is a function") },
+        "A5" : new Date(),
+        "A6" : /(abc|def)/gi
+    };
+
+    var B = {
+        "name" : "B",
+        "B0" : 67890,
+        "B1" : false,
+        "B2" : "ABCDEFG",
+        "B3" : "Will be C"
+    };
+
+    A.A3 = B;
+
+    var C = {
+        "name" : "C",
+        "C0" : 67890,
+        "C1" : false,
+        "C2" : "ABCDEFG",
+        "C3" : "Will be D"
+    };
+
+    B.B3 = C;
+
+    var D = {
+        "name" : "D",
+        "D0" : 67890,
+        "D1" : false,
+        "D2" : "ABCDEFG",
+        "D3" : {
+            "D30" : "D30",
+            "D31" : "D31"
+        },
+        "D4" : "will be B"
+    };
+
+    C.C3 = D;
+    D.D4 = B;
+
+//    __.draw(A, "A", 0, null, 0, false)
+
+//    function Person(name, age){
+//        this.name = name;
+//        this.age = age;
+//    }
+
+//    Person.prototype.getName = function (){
+//        return this.name
+//    };
+//    Person.prototype.getAge = function (){
+//        return this.age
+//    };
+
+//    var person = new Person("Lily", 18);
+//    var person1 = new Person("HanMeiMei", 19);
+//    var ps = [person, person1];
+
+
+    //var start = +new Date();
+    //__.draw(ps, "Person Instances", 0, null, 0, true);
+    //__.draw(Person, "Person", 0, null, 0 , true);
+    //__.draw(Relation, "Relation", 0, null, 0 , false);
+    //var end = +new Date();
+    //console.log("Total time: " + (end - start) + "ms")
+</script>
+</body>
+</html>
