@@ -7,7 +7,7 @@
 @import "entity.css";
 
 html{ height: 100%; }
-body{ font-family: PT Mono,Monaco; min-height: 100%; margin: 0; /*white-space: nowrap;*/ }
+body{ font-family: PT Mono,Monaco, Consolas; min-height: 100%; margin: 0; /*white-space: nowrap;*/ }
 ::selection{background: transparent}
 ul{ padding: 0; margin: 0 }
 ul li{ list-style: none; }
