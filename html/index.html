@@ -34,7 +34,7 @@
             }
         }
 
-        #ed_bak{position:absolute; left:0; top:26px; opacity:0.3;}
+        #ed_bak{white-space: pre; position:absolute; left:0; top:26px; opacity:0.3;}
         .m-editor{width: 860px; height: 480px; z-index:1000; border-radius:4px; background:#33352D; position:fixed; left:50%; top:50%; margin: -240px 0 0 -430px;}
         .m-editor .main{margin: 4px 50px 10px 50px; height: 415px; width:760px; overflow:scroll; outline:none; color: white; white-space: nowrap; font-family: monaco; font-size: 16px;}
         .m-editor .before{color: #C800A4;}
@@ -55,8 +55,9 @@
     <body>
         <div class="m-editor" id="j-editor">
             <div class="before" id="before"></div>
-            <div class="main" contenteditable="false" id="ed"></div>
-            <textarea class="main" style="resize: none; background: none; border: none; padding: 0; font-family: monaco; font-size: 16px;" contenteditable="true" id="ed_bak">/* @example: p({name:'zdy', addr:'BeiJing'}) */</textarea>
+            <div class="main" contenteditable="false" id="ed">
+            </div>
+            <textarea class="main" style="resize: none; background: none; border: none; padding: 0; font-family: monaco; font-size: 16px;" contenteditable="true" id="ed_bak"></textarea>
             <div class="after" id="after"></div>
             <div class="run" id="run">Run</div>
         </div>

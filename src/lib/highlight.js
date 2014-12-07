@@ -2,6 +2,15 @@
  * @fileOverview
  * @author daiying.zhang
  */
+
+String.prototype.times = function (times){
+    var res = this;
+    for(var i = 0; i < times - 1; i++){
+        res += this;
+    }
+    return times === 0 ? "" : res;
+};
+
 function highlight(str){
     var colors = [
         'color:#9CE732; /*font-weight:700*/',
@@ -21,19 +30,7 @@ function highlight(str){
 var ed = document.getElementById('ed_bak');
 var ed_show = document.getElementById('ed');
 ed.addEventListener('input', function(eve){
-    //if(!eve.keyCode.toString().match(/(37|38|39|40)/)){
-        //ed.innerHTML = ed.textContent.replace(/\n/g, '<br/>');
-        //console.warn(ed.textContent.replace(/\n/g, '<br/>'));
-        ed_show.innerHTML = highlight(ed.value).replace(/\n/g, '<br/>').replace(/<br\/?>$/, '<br/>&nbsp;');
-
-        /*var range = document.createRange();
-        var sel = window.getSelection();
-        range.setStart(ed, ed.textContent + 1);
-        range.collapse(true);
-        sel.removeAllRanges();
-        sel.addRange(range);*/
-        setPos()
-    //}
+    onInput()
 });
 
 ed.addEventListener('paste', function(eve){
@@ -47,21 +44,45 @@ ed.addEventListener('keydown', function(eve) {
         eve.preventDefault();
 
 
-        return
+        //return
+        ed.focus(); //This is very important.
         var start = ed.selectionStart;
         var end = ed.selectionEnd;
         // set textarea value to: text before caret + tab + text after caret
-        var con = ed.textContent;
+        var con = ed.value.replace(/\t/g,"    ");
         console.warn(start, end)
-        ed.textContent = con.substring(0, start)
+        ed.value = con.substring(0, start)
             + "    "
             + con.substring(end);
 
         // put caret at right position again
         ed.selectionStart =
-            ed.selectionEnd = start + 1;
+            ed.selectionEnd = start + 4;
+
+        onInput()
     }
 });
+
+function onInput(){
+    //if(!eve.keyCode.toString().match(/(37|38|39|40)/)){
+        //ed.innerHTML = ed.textContent.replace(/\n/g, '<br/>');
+        //console.warn(ed.textContent.replace(/\n/g, '<br/>'));
+        var tabSpace = "&nbsp;".times(4);
+        ed_show.innerHTML = highlight(ed.value.replace(/ /g, "&nbsp;"))
+            .replace(/\n/g, '<br/>')
+            .replace(/<br\/?>$/, '<br/>&nbsp;')
+            .replace(/\t/g, tabSpace)
+            //.replace(/[\s ]/g, "&nbsp;")
+
+        /*var range = document.createRange();
+        var sel = window.getSelection();
+        range.setStart(ed, ed.textContent + 1);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);*/
+        setPos()
+    //}
+}
 
 function setPos(){
     ed_show.scrollLeft = ed.scrollLeft;

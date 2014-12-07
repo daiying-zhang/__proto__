@@ -209,6 +209,8 @@ person._id = "CA9238419"*/
 
     window.__ = $;
 
+    // proto start ==============================================
+
     var buildInObjects = [
         Date.prototype,
         Function.prototype,
@@ -265,10 +267,6 @@ person._id = "CA9238419"*/
         return result
     }
 
-    function getPrex(){
-        //TODO ...
-    }
-
     /**
      *
      * @param obj
@@ -280,7 +278,7 @@ person._id = "CA9238419"*/
      * @param _parentID
      * @param index
      */
-    function proto(obj, isProto, from, name, prex, _id, _parentID, index){
+    function proto(obj, isProto, from, name, prex, _id, _parentID, index, showProto){
         var keys, curr, currPrex, len, objType, buildObjIndex;
 
         isProto = isProto || false;
@@ -308,7 +306,7 @@ person._id = "CA9238419"*/
         //////////////////
         keys = getProps(obj, isProto);
         //如果没有__proto__属性，加入数组遍历__proto__
-        //!~keys.indexOf('__proto__') && keys.push('__proto__');
+        showProto && !~keys.indexOf('__proto__') && keys.push('__proto__');
         len = keys.length;
 
         keys.forEach(function(ele, idx, all){
@@ -323,7 +321,7 @@ person._id = "CA9238419"*/
             try{
                 objType = type(curr = obj[ele]);
 
-                if(objType === 'object'/* || objType === 'function'*/){
+                if(objType === 'object' || objType === 'function'){
                     if(~(buildObjIndex = buildInObjects.indexOf(curr))){
                         //console.log('指向', buildInObjects[buildObjIndex])
                         //console.log('|' + prex + (idx === len -1 ? '   |--' : '|  |--'), buildInObjects[buildObjIndex])
@@ -357,7 +355,7 @@ person._id = "CA9238419"*/
         });
     }
 
-//var deepObj = {};
+    //var deepObj = {};
     var posObj = {};
 
     /**
@@ -745,6 +743,8 @@ person._id = "CA9238419"*/
         return svgLineID
     }
 
+    // proto end ==============================================
+
     /**
      * Math.guid
      * from : http://www.broofa.com/2008/09/javascript-uuid-function/
@@ -810,7 +810,7 @@ person._id = "CA9238419"*/
                 'width': sw + 'px',
                 'height': sh + 'px'
             })
-        }, 0)
+        }, 200)
     };
     //proto(person, false, [],'person', '', Math.guid());
 
@@ -835,6 +835,9 @@ person._id = "CA9238419"*/
     };
 
     $.loadJQ();
+
+    window.loadJQ = loadJQ
+
 })()
 
 // Person:
