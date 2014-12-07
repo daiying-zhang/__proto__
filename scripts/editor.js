@@ -10,6 +10,9 @@
     var domLN = document.getElementById('j-line-number');
     var typePanel = document.getElementById('j-eval-type');
 
+    var jed = Dom('#j-editor')[0];
+    var edtitle = Dom('#before')[0];
+
     ed.addEventListener('input', function(eve){
         onInput()
     });
@@ -192,12 +195,12 @@
         //console.log("code = ", code)
         Dom.globalEval(code);
         window.removeEventListener('error', err);
-        Dom('#j-editor')[0].style.display = 'none';
+        jed.style.display = 'none';
     });
 
     document.addEventListener('dblclick', function(eve){
         eve.preventDefault();
-        var ed = Dom('#j-editor')[0];
+        var ed = jed;
         ed.style.display = ed.style.display === 'none' ? '' : 'none';
     });
 
@@ -209,10 +212,10 @@
         }
         if(tagName === 'INPUT'){
             if(target.value === '0'){
-                Dom.removeClass(Dom('#before')[0], 'clours')
+                Dom.removeClass(Dom('#before')[0], 'clours');
                 Dom.removeClass(Dom('#after')[0], 'clours')
             }else{
-                Dom.addClass(Dom('#before')[0], 'clours')
+                Dom.addClass(Dom('#before')[0], 'clours');
                 Dom.addClass(Dom('#after')[0], 'clours')
             }
         }
@@ -238,4 +241,37 @@
         });
         return res;
     }
+
+    Dom.css(jed, {
+        "left" : (document.body.offsetWidth - jed.offsetWidth) / 2 + "px",
+        "top" : (document.body.offsetHeight - jed.offsetHeight) / 2 + "px"
+    });
+
+    Dom.drag(edtitle, true);
+
+    edtitle.addEventListener('dblclick', function(eve){
+        var isMaxed = Dom.data(edtitle, "isMaxed");
+        if(isMaxed){
+            var size = Dom.data(edtitle, 'size');
+            Dom.data(edtitle, "isMaxed", false);
+            Dom.css(jed, size);
+        }else{
+            Dom.data(edtitle, "isMaxed", true)
+            Dom.data(edtitle, "size", {
+                    "width": jed.offsetWidth + "px",
+                    "height": jed.offsetHeight + "px",
+                    "left": Dom.css(jed, "left"),
+                    "top": Dom.css(jed, "top")
+                }
+            );
+            Dom.css(jed, {
+                    "width": "100%",
+                    "height": "100%",
+                    "left": "0",
+                    "top": "0"
+                }
+            );
+        }
+        eve.stopPropagation()
+    });
 })(this);
