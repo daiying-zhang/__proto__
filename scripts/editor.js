@@ -30,7 +30,7 @@
 
             //return
             ed.focus(); //This is very important.
-            var value = ed.value;
+            //var value = ed.value;
             var start = ed.selectionStart;
             var end = ed.selectionEnd;
 
@@ -113,6 +113,12 @@
      * @returns {*[]}
      */
     function getLineRange(start, end){
+        if(arguments.length !== 2){
+            ed.focus(); //This is very important.
+            start = ed.selectionStart;
+            end = ed.selectionEnd;
+        }
+
         var value = ed.value;
         var startLine = 0, endLine = 0, lastIndex = value.indexOf("\n", 0);
         while(lastIndex !== -1 && lastIndex < start){
@@ -136,12 +142,13 @@
         //ed.innerHTML = ed.textContent.replace(/\n/g, '<br/>');
         //console.warn(ed.textContent.replace(/\n/g, '<br/>'));
         var tabSpace = "&nbsp;".times(4);
+        //ed.value = ed.value.replace(/ /g, '0')
         ed_show.innerHTML = highlight(ed.value.replace(/ /g, "&nbsp;"))
             .replace(/\n/g, '<br/>')
             .replace(/<br\/?>$/, '<br/>&nbsp;')
             .replace(/\t/g, tabSpace)
         //.replace(/[\s ]/g, "&nbsp;")
-
+        //ed.value = ed.value.replace(/ /g, '0')
         /*var range = document.createRange();
          var sel = window.getSelection();
          range.setStart(ed, ed.textContent + 1);
@@ -153,10 +160,24 @@
         //}
     }
 
-    function setPos(){
+    function setPos(eve){
+        //console.log("ed.scrollTop", ed.scrollTop);
+        //console.log("ed.scrollHeight", ed.scrollHeight, ed_show.scrollHeight)
+        //if(!eve){
+        //    // 如果eve为空 ==> 是手动调用setPos(), 处理最后一行
+        //
+        //    var range = getLineRange(), isSameLine = range[0] === range[1],
+        //        isLast = isSameLine && range[1] === getLines().length;
+        //
+        //    console.log(range, getLines().length)
+        //    if(isLast){
+        //        console.log("isLast line....")
+        //        ed.scrollTop = ed.scrollHeight
+        //    }
+        //}
         ed_show.scrollLeft = ed.scrollLeft;
         ed_show.scrollTop = ed.scrollTop;
-        domLN.scrollTop = ed.scrollTop
+        domLN.scrollTop = ed.scrollTop;
     }
 
     function getLines(){
@@ -176,7 +197,7 @@
     }
 
     ed.addEventListener('scroll', function(eve){
-        setPos()
+        setPos(eve)
     });
 
     onInput();

@@ -7,6 +7,8 @@ function $(selector){
     return document.querySelectorAll(selector);
 }
 
+var toString = Object.prototype.toString;
+
 $.id = '$' + (String(Math.random())).replace(/\W/g,'');
 $._cache = {};
 

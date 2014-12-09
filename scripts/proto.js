@@ -29,6 +29,8 @@
         'RegExp.prototype'
     ];
 
+    var isIE = navigator.userAgent.match(/MSIE/);
+
     var __ = {
         getProtoKeys: function(obj, showProto){
             var keys = typeof obj === 'object' || typeof obj === 'function'
@@ -91,13 +93,18 @@
             cache["obj"].push(obj);
             if(buildInObjects.indexOf(obj) !== -1){
                 //todo 实现可配置
+                // 如果是内置构造器，只显示__proto__属性
                 keys = ["__proto__"];
                 //return
             }
 
             for(var i = 0; i < keys.length; i++){
                 try{
-                    tmpValue = obj[keys[i]];
+                    if(keys[i] === '__proto__' && isIE){
+                        tmpValue = obj.constructor.prototype;
+                    }else{
+                        tmpValue = obj[keys[i]];
+                    }
                 }catch (e){
                     tmpValue = "[Exception]";
                 }
