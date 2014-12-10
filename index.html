@@ -33,7 +33,8 @@
     <div class="line-number" id="j-line-number"></div>
     <div class="main" contenteditable="false" id="ed">
     </div>
-    <textarea class="main ed_bak" id="ed_bak">
+    <div class="main">
+    <textarea class="ed_bak" id="ed_bak">
 /**
  * 绘制实体关系图
  * @name __.draw
@@ -63,6 +64,7 @@ Person.cache = {};
 var person = new Person("Lily", 18);
 __.clear().draw(person, "Lily", 0, null, 0, true)
     </textarea>
+    </div>
     <div class="after" id="after"></div>
     <div class="run" id="run">Run<i class="arrow"></i></div>
 </div>

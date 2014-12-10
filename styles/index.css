@@ -13,7 +13,7 @@ ul{ padding: 0; margin: 0 }
 ul li{ list-style: none; }
 
 input[type=radio]{ -webkit-appearance: none; -moz-appearance: none; appearance:none; outline: none;
-    width: 16px; height: 16px; background: #B5C4C4; border-radius: 50% }
+    width: 16px; height: 16px; background: #B5C4C4; border-radius: 50%; }
 input[type=radio]:checked{ background: #56BDD7; }
 input[type=radio]:before{ display: inline-block; content: " "; background:white;
     width: 8px; height: 8px; position:relative; left: 4px; top: 0px; border-radius: 50%}
