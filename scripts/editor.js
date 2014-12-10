@@ -255,7 +255,7 @@
             'color:red',
             'color:rgba(185,177,177,.8);/*font-style: italic;*/',
             'color:orange;'];
-        var reg = /\b(document|body|alert|if|else|while|this|arguments)\b|(var|new|function|return|true|false)|([\"'].*?[\"'])|(\b[+-]?\d+(?:\.\d+)?)|(\/\/.*|\/\*[\s\S]*?\*\/)|(\?|:|\+\+|--|\+|-|\|{1,2}|={1,3}|\*=|\/=|\+=|-=)/g;
+        var reg = /\b(console\.(?:log|error|warn)|document|body|alert|if|else|while|this|arguments)\b|(var|new|function|return|true|false)|([\"'].*?[\"'])|(\b[+-]?\d+(?:\.\d+)?)|(\/\/.*|\/\*[\s\S]*?\*\/)|(\?|:|\+\+|--|\+|-|\|{1,2}|={1,3}|\*=|\/=|\+=|-=)/g;
         var res = str.replace(reg, function(match){
             var args = [].slice.call(arguments,1);
             return '<span style="' + colors[args.indexOf(match)] + '">' + match + '</span>';
