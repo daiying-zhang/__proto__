@@ -143,7 +143,7 @@
         //console.warn(ed.textContent.replace(/\n/g, '<br/>'));
         var tabSpace = "&nbsp;".times(4);
         //ed.value = ed.value.replace(/ /g, '0')
-        ed_show.innerHTML = highlight(ed.value.replace(/ /g, "&nbsp;"))
+        ed_show.innerHTML = highlight(ed.value.replace(/ /g, "&nbsp;").replace(/</g, "&lt;"))
             .replace(/\n/g, '<br/>')
             .replace(/<br\/?>$/, '<br/>&nbsp;')
             .replace(/\t/g, tabSpace)
